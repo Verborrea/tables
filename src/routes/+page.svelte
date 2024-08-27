@@ -73,7 +73,7 @@
 			BUSCAR
 		</button>
 	</form>
-	<form id="filters" class="flex items-center gap-6">
+	<form id="filters" class="flex items-center gap-4">
 		<input type="text" class="hidden" name="query" value={query} />
 		<button class="btn btn-primary">
 			<svg class="w-5 h-5" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
