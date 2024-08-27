@@ -76,3 +76,13 @@ export async function load({ url }) {
 		totalItems
 	}
 }
+
+/** @type {import('./$types').Actions} */
+export const actions = {
+	delete: async ({ request }) => {
+		const data = await request.formData()
+		const selection = data.get('selection').split(',')
+
+		return { success: true, quantity: selection.length };
+	}
+};

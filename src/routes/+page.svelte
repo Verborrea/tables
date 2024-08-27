@@ -1,10 +1,5 @@
 <script>
-	import { navigating } from '$app/stores';
-	import { tick } from 'svelte';
-	import { cubicOut } from 'svelte/easing';
-	import { tweened } from 'svelte/motion';
-
-	export let data;
+	export let data, form;
 
 	let query = '';
 	let module = '';
@@ -19,43 +14,17 @@
 		}
 	}
 
-	// Para la barra de progreso
-	const progressValue = tweened(0, {
-		duration: 400,
-		easing: cubicOut
-	});
-
-	$: $navigating ? startProgress() : resetProgress();
-
-	async function startProgress() {
-		progressValue.set(0);
-		// Esperar al siguiente ciclo de renderizado
-		await tick();
-		progressValue.set(50);
-
-		const increment = () => {
-			if ($navigating) {
-				progressValue.update(n => Math.min(n + 5, 90));
-				setTimeout(increment, 300);
-			}
-		};
-
-		increment();
-	}
-
-	function resetProgress() {
-		progressValue.set(100);
+	$: if (form?.success) {
 		setTimeout(() => {
-			progressValue.set(0);
-		}, 200);
+			form.success = false
+		}, 2000)
 	}
 </script>
 
-<progress class="progress progress-primary w-full block" value={$progressValue} max="100"></progress>
 <main class="p-8 flex flex-col gap-6">
 	<h1 class="text-4xl font-bold">Lista de Cursos</h1>
-	<form class="flex items-center gap-4">
-		<label class="input input-bordered flex items-center gap-2 grow">
+	<form class="fc gap-4">
+		<label class="input input-bordered fc gap-2 grow">
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="h-6 w-6 opacity-70">
 				<path fill-rule="evenodd" d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" clip-rule="evenodd" />
 			</svg>
@@ -73,43 +42,36 @@
 			BUSCAR
 		</button>
 	</form>
-	<form id="filters" class="flex items-center gap-4">
-		<input type="text" class="hidden" name="query" value={query} />
-		<button class="btn btn-primary">
-			<svg class="w-5 h-5" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-				<path d="M10.3485 17.365C10.0902 17.365 9.86846 17.2762 9.68332 17.0987C9.49832 16.9211 9.40582 16.701 9.40582 16.4383V12.9267C9.40582 12.6642 9.49686 12.4441 9.67895 12.2665C9.86117 12.0888 10.0814 12 10.3398 12C10.5981 12 10.8179 12.0888 10.9992 12.2665C11.1803 12.4441 11.2708 12.6642 11.2708 12.9267V13.75H16.3383C16.6007 13.75 16.8217 13.8384 17.0012 14.0152C17.181 14.1919 17.2708 14.4109 17.2708 14.6723C17.2708 14.9306 17.182 15.1524 17.0044 15.3375C16.8269 15.5225 16.6068 15.615 16.3442 15.615H11.2708V16.4383C11.2708 16.701 11.1824 16.9211 11.0056 17.0987C10.8289 17.2762 10.6099 17.365 10.3485 17.365ZM3.65582 15.615C3.39318 15.615 3.17311 15.524 2.99561 15.3419C2.81798 15.1596 2.72916 14.9394 2.72916 14.681C2.72916 14.4227 2.81798 14.2029 2.99561 14.0217C3.17311 13.8406 3.39318 13.75 3.65582 13.75H7.16749C7.43013 13.75 7.6502 13.8384 7.8277 14.0152C8.00534 14.1919 8.09416 14.4109 8.09416 14.6723C8.09416 14.9306 8.00534 15.1524 7.8277 15.3375C7.6502 15.5225 7.43013 15.615 7.16749 15.615H3.65582ZM6.67186 12.6767C6.41353 12.6767 6.19186 12.5851 6.00686 12.4021C5.82173 12.2192 5.72916 11.9978 5.72916 11.7381V10.9267H3.66124C3.39916 10.9267 3.17832 10.8383 2.99874 10.6615C2.81902 10.4846 2.72916 10.2656 2.72916 10.0044C2.72916 9.74312 2.81798 9.52263 2.99561 9.34291C3.17311 9.16319 3.39318 9.07333 3.65582 9.07333H5.72916V8.25C5.72916 7.98749 5.82027 7.76743 6.00249 7.58979C6.18457 7.41215 6.40478 7.32333 6.66311 7.32333C6.92145 7.32333 7.14124 7.41215 7.32249 7.58979C7.5036 7.76743 7.59416 7.98749 7.59416 8.25V11.75C7.59416 12.0125 7.50575 12.2326 7.32895 12.4102C7.15228 12.5878 6.93325 12.6767 6.67186 12.6767ZM9.83249 10.9267C9.56985 10.9267 9.34978 10.8383 9.17228 10.6615C8.99464 10.4846 8.90582 10.2656 8.90582 10.0044C8.90582 9.74312 8.99464 9.52263 9.17228 9.34291C9.34978 9.16319 9.56985 9.07333 9.83249 9.07333H16.3442C16.6068 9.07333 16.8269 9.16173 17.0044 9.33854C17.182 9.51534 17.2708 9.73437 17.2708 9.99562C17.2708 10.2569 17.182 10.4774 17.0044 10.6571C16.8269 10.8368 16.6068 10.9267 16.3442 10.9267H9.83249ZM12.8485 8C12.5902 8 12.3685 7.91118 12.1833 7.73354C11.9983 7.5559 11.9058 7.33583 11.9058 7.07333V3.56166C11.9058 3.29902 11.9969 3.07895 12.1789 2.90145C12.3612 2.72381 12.5814 2.63499 12.8398 2.63499C13.0981 2.63499 13.3179 2.72381 13.4992 2.90145C13.6803 3.07895 13.7708 3.29902 13.7708 3.56166V4.38499H16.3442C16.6068 4.38499 16.8269 4.47333 17.0044 4.65C17.182 4.8268 17.2708 5.0459 17.2708 5.30729C17.2708 5.56562 17.182 5.78729 17.0044 5.97229C16.8269 6.15743 16.6068 6.24999 16.3442 6.24999H13.7708V7.07333C13.7708 7.33583 13.6824 7.5559 13.5056 7.73354C13.3289 7.91118 13.1099 8 12.8485 8ZM3.65582 6.24999C3.39318 6.24999 3.17311 6.15888 2.99561 5.97666C2.81798 5.79458 2.72916 5.57437 2.72916 5.31604C2.72916 5.05756 2.81798 4.83777 2.99561 4.65666C3.17311 4.47555 3.39318 4.38499 3.65582 4.38499H10.1675C10.4301 4.38499 10.6502 4.47333 10.8277 4.65C11.0053 4.8268 11.0942 5.0459 11.0942 5.30729C11.0942 5.56562 11.0053 5.78729 10.8277 5.97229C10.6502 6.15743 10.4301 6.24999 10.1675 6.24999H3.65582Z" fill="currentColor"/>
-			</svg>
-			FILTRAR
-		</button>
-		<label class="flex items-center gap-2" for="career">
-			Carrera:
-			<select
-				id="career"
-				name="career"
-				class="select select-bordered"
-				bind:value={career}
-			>
-				<option value="" selected>Todas</option>
+	<header class="fcb4">
+		<form id="filters" class="fc gap-4">
+			<input type="text" class="hidden" name="query" value={query} />
+			<button class="btn btn-primary">
+				<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path d="M10.3485 17.365C9.83539 17.365 9.40579 16.9555 9.40579 16.4383V12.9267C9.40579 12.4116 9.82633 12 10.3398 12C10.8533 12 11.2708 12.4122 11.2708 12.9267V13.75H16.3383C16.8524 13.75 17.2708 14.1553 17.2708 14.6723C17.2708 15.1853 16.8612 15.615 16.3441 15.615H11.2708V16.4383C11.2708 16.9532 10.8646 17.365 10.3485 17.365ZM3.65579 15.615C3.14068 15.615 2.72913 15.1945 2.72913 14.6811C2.72913 14.1674 3.14132 13.75 3.65579 13.75H7.16746C7.68212 13.75 8.09413 14.1563 8.09413 14.6723C8.09413 15.1853 7.68449 15.615 7.16746 15.615H3.65579ZM6.67183 12.6767C6.1586 12.6767 5.72913 12.2524 5.72913 11.7381V10.9267H3.66121C3.14727 10.9267 2.72913 10.5211 2.72913 10.0044C2.72913 9.48893 3.13924 9.07334 3.65579 9.07334H5.72913V8.25001C5.72913 7.73504 6.1498 7.32334 6.66308 7.32334C7.17667 7.32334 7.59413 7.73556 7.59413 8.25001V11.75C7.59413 12.2647 7.18777 12.6767 6.67183 12.6767ZM9.83246 10.9267C9.31783 10.9267 8.90579 10.5203 8.90579 10.0044C8.90579 9.48893 9.31591 9.07334 9.83246 9.07334H16.3441C16.8588 9.07334 17.2708 9.47968 17.2708 9.99564C17.2708 10.5111 16.8607 10.9267 16.3441 10.9267H9.83246ZM12.8485 8.00001C12.3356 8.00001 11.9058 7.59036 11.9058 7.07334V3.56168C11.9058 3.04657 12.3263 2.63501 12.8398 2.63501C13.3534 2.63501 13.7708 3.04721 13.7708 3.56168V4.38501H16.3441C16.8589 4.38501 17.2708 4.79118 17.2708 5.3073C17.2708 5.82014 16.861 6.25001 16.3441 6.25001H13.7708V7.07334C13.7708 7.58799 13.3644 8.00001 12.8485 8.00001ZM3.65579 6.25001C3.14081 6.25001 2.72913 5.82937 2.72913 5.31605C2.72913 4.80241 3.14129 4.38501 3.65579 4.38501H10.1675C10.6822 4.38501 11.0941 4.79118 11.0941 5.3073C11.0941 5.82014 10.6844 6.25001 10.1675 6.25001H3.65579Z" fill="currentColor"/>
+				</svg>
+				FILTRAR
+			</button>
+			<select id="career" name="career" class="select select-bordered" bind:value={career}>
+				<option value="" selected>Todas las carreras</option>
 				{#each data.careers as career}
 					<option value={career}>{career}</option>
 				{/each}
 			</select>
-		</label>
-		<label class="flex items-center gap-2" for="module">
-			Módulo:
-			<select
-				id="module"
-				name="module"
-				class="select select-bordered"
-				bind:value={module}
-			>
-				<option value="" selected>Todos</option>
+			<select id="module" name="module" class="select select-bordered" bind:value={module}>
+				<option value="" selected>Todos los módulos</option>
 				{#each data.modules as mod}
-					<option value={mod}>{mod}</option>
+					<option value={mod}>Módulo {mod}</option>
 				{/each}
 			</select>
-		</label>
-	</form>
+		</form>
+		<form id="eraseSelection" action="?/delete" method="post">
+			<input type="text" class="hidden" name="selection" value={selection}>
+			<button class="btn btn-error" disabled={selection.length === 0}>
+				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" class="h-5 w-5 shrink-0"><path fill="currentColor" fill-rule="evenodd" d="M10.556 4a1 1 0 0 0-.97.751l-.292 1.14h5.421l-.293-1.14A1 1 0 0 0 13.453 4zm6.224 1.892-.421-1.639A3 3 0 0 0 13.453 2h-2.897A3 3 0 0 0 7.65 4.253l-.421 1.639H4a1 1 0 1 0 0 2h.1l1.215 11.425A3 3 0 0 0 8.3 22H15.7a3 3 0 0 0 2.984-2.683l1.214-11.425H20a1 1 0 1 0 0-2zm1.108 2H6.112l1.192 11.214A1 1 0 0 0 8.3 20H15.7a1 1 0 0 0 .995-.894zM10 10a1 1 0 0 1 1 1v5a1 1 0 1 1-2 0v-5a1 1 0 0 1 1-1m4 0a1 1 0 0 1 1 1v5a1 1 0 1 1-2 0v-5a1 1 0 0 1 1-1" clip-rule="evenodd"></path></svg>
+				Borrar Selección
+			</button>
+		</form>
+	</header>
 	<table class="table table-auto table-zebra">
 		<thead>
 			<tr>
@@ -150,7 +112,7 @@
 			{/each}
 		</tbody>
 	</table>
-	<footer class="flex items-center justify-between">
+	<footer class="fcb4">
 		<p>
 			Mostrando
 			{(data.page - 1) * data.perPage + (data.totalItems > 1 ? 1 : 0)}
@@ -197,3 +159,26 @@
 		</div>
 	</footer>
 </main>
+{#if form?.success}
+<div class="toast toast-center">
+	<div role="alert" class="alert alert-success">
+		<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+		</svg>
+		<span>{form.quantity} cursos eliminados con éxito</span>
+	</div>
+</div>
+{/if}
+
+<style lang="postcss">
+	.fc {
+		display: flex;
+		align-items: center;
+	}
+	.fcb4 {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		justify-content: space-between;
+	}
+</style>
