@@ -72,7 +72,7 @@
 			</button>
 		</form>
 	</header>
-	<table class="table table-auto table-zebra">
+	<table class="table table-auto">
 		<thead>
 			<tr>
 				<th>
@@ -93,7 +93,7 @@
 		</thead>
 		<tbody>
 			{#each data.courses as course (course.id)}
-				<tr class="hover">
+				<tr class="hover" class:bg-base-200={selection.includes(course.id)}>
 					<td>
 						<label>
 							<input
